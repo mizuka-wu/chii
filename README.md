@@ -58,6 +58,24 @@ Use this script to inject the target code into your webpage.
 
 Then browse to localhost:8080 to start debugging your page.
 
+### Private Token
+
+You can use the private token feature to filter and protect your debugging targets:
+
+1. In the target page, set `chii-private-token` in localStorage:
+```javascript
+localStorage.setItem('chii-private-token', 'your-private-token');
+```
+
+2. When accessing the debugging page, you can add a token query parameter to only show matching targets:
+```
+http://localhost:8080/?token=your-private-token
+```
+
+3. If no token parameter is provided, only targets without a token will be displayed.
+
+This feature helps you view and debug only your own target pages when multiple people are sharing the same debugging server.
+
 For more detailed usage instructions, please read the documentation at [chii.liriliri.io](https://chii.liriliri.io/docs/)!
 
 ## Related Projects

@@ -41,6 +41,7 @@ module.exports = class WebSocketServer {
           ws.type = type;
           ws.id = id;
           const q = query.parse(urlObj.query);
+          ws.token = q.token || undefined;
           if (type === 'target') {
             ws.chiiUrl = q.url;
             ws.title = q.title;

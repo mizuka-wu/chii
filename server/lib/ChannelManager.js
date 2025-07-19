@@ -73,8 +73,22 @@ module.exports = class ChannelManager extends Emitter {
     util.log(`${ansiColor.blue('client')} ${id} ${ansiColor.red('disconnected')}`);
     delete this._clients[id];
   }
-  getTargets() {
-    return this._targets;
+  getTargets(token) {
+    // 如果没有传入token，只返回没有token的目标
+    if (!token) {
+      return Object.fromEntries(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        Object.entries(this._targets).filter(([_, target]) => !target.ws.token)
+      );
+    }
+    
+    // 如果传入了特定token，只返回匹配该token的目标
+    return Object.fromEntries(
+      Object.entries(this._targets).filter(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        ([_, target]) => target.ws.token === token
+      )
+    );
   }
   getClients() {
     return this._clients;

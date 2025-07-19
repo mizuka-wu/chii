@@ -47,8 +47,9 @@ module.exports = function (channelManager, domain, cdn, basePath) {
   channelManager.on('target_changed', () => (timestamp = now()));
 
   router.get(`${basePath}targets`, ctx => {
+    const { token } = ctx.query;
     const targets = reverse(
-      map(pairs(channelManager.getTargets()), item => {
+      map(pairs(channelManager.getTargets(token)), item => {
         const ret = {
           id: item[0],
           ...item[1],
