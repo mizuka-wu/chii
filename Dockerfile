@@ -10,12 +10,12 @@ RUN apt-get update && apt-get install -y git curl xz-utils python3-pkg-resources
 # 安装depot_tools并设置环境变量
 RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 
+# 安装npm依赖
+RUN npm i -g @liriliri/lsla
+
 # 复制项目文件
 COPY package.json package-lock.json* ./ 
 COPY . .
-
-# 安装npm依赖
-RUN npm i -g @liriliri/lsla
 
 # 设置depot_tools路径
 ENV PATH="/app/depot_tools:${PATH}"
