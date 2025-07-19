@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   chii:
     image: mizukawu/chii
