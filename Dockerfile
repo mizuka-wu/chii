@@ -20,10 +20,11 @@ COPY . .
 # 设置depot_tools路径
 ENV PATH="/app/depot_tools:${PATH}"
 
-RUN npm i
-
 # 初始化前端代码
 RUN npm run init:front_end
+
+## 安装依赖
+RUN npm i
 
 # 执行构建
 RUN npm run build
