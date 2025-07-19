@@ -1,6 +1,6 @@
 {
   "name": "@mizuka-wu/chii",
-  "version": "1.15.4",
+  "version": "0.0.1",
   "description": "Chrome devtools framework",
   "main": "./server/index.js",
   "bin": {
