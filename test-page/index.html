@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chii 测试页面</title>
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Chii 测试页面</h1>
+    </header>
+    <main>
+      <section class="token-section">
+        <h2>Chii Private Token 设置</h2>
+        <div class="token-container">
+          <input type="text" id="tokenInput" placeholder="输入 chii-private-token">
+          <button id="setTokenBtn">设置 Token</button>
+          <button id="clearTokenBtn">清除 Token</button>
+        </div>
+        <div class="token-status">
+          <p>当前 Token: <span id="currentToken">无</span></p>
+        </div>
+      </section>
+      <section class="info-section">
+        <h2>使用说明</h2>
+        <p>1. 此页面已默认加载 <code>http://localhost:8080/target.js</code></p>
+        <p>2. 使用上方输入框设置或清除 chii-private-token</p>
+        <p>3. 在 <a href="http://localhost:8080" target="_blank">http://localhost:8080</a> 访问调试页面</p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
