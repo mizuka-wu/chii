@@ -74,21 +74,16 @@ module.exports = class ChannelManager extends Emitter {
     delete this._clients[id];
   }
   getTargets(token) {
-    // 如果没有传入token，只返回没有token的目标
-    if (!token) {
-      return Object.fromEntries(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        Object.entries(this._targets).filter(([_, target]) => !target.ws.token)
-      );
-    }
+    // 输出日志，查看 token 和 targets 数据
+    util.log(`${ansiColor.blue('getTargets')} token: ${token || 'undefined'}, targets count: ${Object.keys(this._targets).length}`);
+    util.log(`${ansiColor.blue('getTargets')} targets: ${JSON.stringify(this._targets, (key, value) => {
+      // 避免循环引用导致的 JSON 序列化错误
+      if (key === 'channel' || key === 'ws') return '[Object]';
+      return value;
+    }, 2)}`);
     
-    // 如果传入了特定token，只返回匹配该token的目标
-    return Object.fromEntries(
-      Object.entries(this._targets).filter(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, target]) => target.ws.token === token
-      )
-    );
+    // 不再过滤，直接返回所有 targets
+    return this._targets;
   }
   getClients() {
     return this._clients;
