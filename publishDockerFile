@@ -1,0 +1,19 @@
+# 使用Node.js 18官方镜像作为基础（最小化版本）
+FROM node:18-slim
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装全局依赖
+RUN npm install -g @mizuka-wu/chii
+
+# 暴露服务端口
+EXPOSE 8080
+
+# 启动命令
+CMD ["chii", "start"]
+
+# 构建命令示例:
+# docker build -t mizukawu/chii-mini -f publishDockerFile .
+# 运行命令示例:
+# docker run -p 8080:8080 mizukawu/chii-mini
