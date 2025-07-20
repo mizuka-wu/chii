@@ -78,6 +78,99 @@ http://localhost:8080/?token=你的私有令牌
 
 有关更详细的使用说明，请阅读 [chii.liriliri.io](https://chii.liriliri.io/docs/) 上的文档！
 
+### VConsole 连接方式
+
+您可以在 VConsole 中添加一个自定义 tab 来连接 Chii 服务器：
+
+```javascript
+// 创建 VConsole 连接 Chii 的 tab
+function createChiiConnector(vConsole) {
+  // 添加一个新的 tab
+  const tab = vConsole.addPlugin({
+    id: 'chii_connector',
+    name: 'Chii',
+    template: `
+      <div>
+        <div class="vc-item">
+          <div class="vc-item-content">服务器地址：</div>
+        </div>
+        <div class="vc-item">
+          <input type="text" placeholder="ip:port/path 或 hostname:port/path" id="chii-server-input" style="width:100%;padding:5px;box-sizing:border-box;">
+        </div>
+        <div class="vc-item">
+          <div class="vc-item-content">Token (可选)：</div>
+        </div>
+        <div class="vc-item">
+          <input type="text" placeholder="输入私有token" id="chii-token-input" style="width:100%;padding:5px;box-sizing:border-box;">
+        </div>
+        <div class="vc-item">
+          <button id="chii-connect-btn" style="margin:10px 0;padding:5px 10px;">连接</button>
+        </div>
+        <div id="chii-status" class="vc-item"></div>
+      </div>
+    `,
+    onReady() {
+      const connectBtn = document.getElementById('chii-connect-btn');
+      const serverInput = document.getElementById('chii-server-input');
+      const tokenInput = document.getElementById('chii-token-input');
+      const statusDiv = document.getElementById('chii-status');
+      
+      connectBtn.addEventListener('click', () => {
+        // 移除可能已存在的连接脚本
+        const oldScript = document.getElementById('chii-connecter');
+        if (oldScript) {
+          document.body.removeChild(oldScript);
+        }
+        
+        // 获取服务器地址和token
+        const serverAddress = serverInput.value.trim();
+        const token = tokenInput.value.trim();
+        
+        if (!serverAddress) {
+          statusDiv.innerHTML = '<div class="vc-item-content" style="color:red;">请输入服务器地址</div>';
+          return;
+        }
+        
+        // 自动判断协议
+        const protocol = window.location.protocol;
+        const scriptSrc = `${protocol}//${serverAddress}/target.js`;
+        
+        // 如果有token，设置到localStorage
+        if (token) {
+          localStorage.setItem('chii-private-token', token);
+        }
+        
+        // 创建script标签
+        const script = document.createElement('script');
+        script.id = 'chii-connecter';
+        script.src = scriptSrc;
+        script.onerror = () => {
+          statusDiv.innerHTML = '<div class="vc-item-content" style="color:red;">连接失败，请检查服务器地址</div>';
+        };
+        script.onload = () => {
+          statusDiv.innerHTML = '<div class="vc-item-content" style="color:green;">连接成功！</div>';
+        };
+        
+        document.body.appendChild(script);
+        statusDiv.innerHTML = '<div class="vc-item-content">正在连接...</div>';
+      });
+    }
+  });
+}
+
+// 使用示例
+if (window.VConsole) {
+  createChiiConnector(window.VConsole);
+} else {
+  // 等待VConsole初始化完成
+  window.addEventListener('vconsole.ready', (event) => {
+    createChiiConnector(event.detail.vConsole);
+  });
+}
+```
+
+使用上述代码，您可以在VConsole中添加一个名为"Chii"的tab，通过输入服务器地址和可选的token来连接Chii服务器进行调试。
+
 ## 相关项目
 
 * [whistle.chii](https://github.com/liriliri/whistle.chii)：Whistle Chii 插件。

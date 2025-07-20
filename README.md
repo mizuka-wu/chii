@@ -78,6 +78,99 @@ This feature helps you view and debug only your own target pages when multiple p
 
 For more detailed usage instructions, please read the documentation at [chii.liriliri.io](https://chii.liriliri.io/docs/)!
 
+### VConsole Connection Method
+
+You can add a custom tab in VConsole to connect to the Chii server:
+
+```javascript
+// Create a VConsole tab to connect to Chii
+function createChiiConnector(vConsole) {
+  // Add a new tab
+  const tab = vConsole.addPlugin({
+    id: 'chii_connector',
+    name: 'Chii',
+    template: `
+      <div>
+        <div class="vc-item">
+          <div class="vc-item-content">Server Address:</div>
+        </div>
+        <div class="vc-item">
+          <input type="text" placeholder="ip:port/path or hostname:port/path" id="chii-server-input" style="width:100%;padding:5px;box-sizing:border-box;">
+        </div>
+        <div class="vc-item">
+          <div class="vc-item-content">Token (optional):</div>
+        </div>
+        <div class="vc-item">
+          <input type="text" placeholder="Enter private token" id="chii-token-input" style="width:100%;padding:5px;box-sizing:border-box;">
+        </div>
+        <div class="vc-item">
+          <button id="chii-connect-btn" style="margin:10px 0;padding:5px 10px;">Connect</button>
+        </div>
+        <div id="chii-status" class="vc-item"></div>
+      </div>
+    `,
+    onReady() {
+      const connectBtn = document.getElementById('chii-connect-btn');
+      const serverInput = document.getElementById('chii-server-input');
+      const tokenInput = document.getElementById('chii-token-input');
+      const statusDiv = document.getElementById('chii-status');
+      
+      connectBtn.addEventListener('click', () => {
+        // Remove any existing connection script
+        const oldScript = document.getElementById('chii-connecter');
+        if (oldScript) {
+          document.body.removeChild(oldScript);
+        }
+        
+        // Get server address and token
+        const serverAddress = serverInput.value.trim();
+        const token = tokenInput.value.trim();
+        
+        if (!serverAddress) {
+          statusDiv.innerHTML = '<div class="vc-item-content" style="color:red;">Please enter server address</div>';
+          return;
+        }
+        
+        // Auto-detect protocol
+        const protocol = window.location.protocol;
+        const scriptSrc = `${protocol}//${serverAddress}/target.js`;
+        
+        // Set token to localStorage if provided
+        if (token) {
+          localStorage.setItem('chii-private-token', token);
+        }
+        
+        // Create script tag
+        const script = document.createElement('script');
+        script.id = 'chii-connecter';
+        script.src = scriptSrc;
+        script.onerror = () => {
+          statusDiv.innerHTML = '<div class="vc-item-content" style="color:red;">Connection failed, please check server address</div>';
+        };
+        script.onload = () => {
+          statusDiv.innerHTML = '<div class="vc-item-content" style="color:green;">Connected successfully!</div>';
+        };
+        
+        document.body.appendChild(script);
+        statusDiv.innerHTML = '<div class="vc-item-content">Connecting...</div>';
+      });
+    }
+  });
+}
+
+// Usage example
+if (window.VConsole) {
+  createChiiConnector(window.VConsole);
+} else {
+  // Wait for VConsole to initialize
+  window.addEventListener('vconsole.ready', (event) => {
+    createChiiConnector(event.detail.vConsole);
+  });
+}
+```
+
+With the code above, you can add a tab named "Chii" in VConsole, allowing you to connect to a Chii server for debugging by entering the server address and an optional token.
+
 ## Related Projects
 
 * [whistle.chii](https://github.com/liriliri/whistle.chii): Whistle Chii plugin.
