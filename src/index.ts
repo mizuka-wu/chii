@@ -122,7 +122,7 @@ const dataGrid = new LunaDataGrid($targets.get(0) as HTMLElement, {
 });
 
 function update() {
-  fetch(`${window.basePath}targets`)
+  fetch(`${window.basePath}targets${location.search}`)
     .then(res => res.json())
     .then(data => {
       const count = data.targets.length;

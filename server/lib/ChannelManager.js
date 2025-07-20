@@ -14,7 +14,7 @@ module.exports = class ChannelManager extends Emitter {
   createTarget(id, ws, url, title, favicon, ip, userAgent) {
     const channel = createChannel(ws);
 
-    util.log(`${ansiColor.yellow('target')} ${id}:${truncate(title, 10)} ${ansiColor.green('connected')}`);
+    util.log(`${ansiColor.yellow('target')} ${id}:${truncate(title, 10)} ${ansiColor.green('connected')} token: ${ws.token}`);
     this._targets[id] = {
       id,
       title,
@@ -25,6 +25,7 @@ module.exports = class ChannelManager extends Emitter {
       ip,
       userAgent,
       rtc: ws.rtc,
+      token: ws.token
     };
 
     ws.on('close', () => this.removeTarget(id, title));
@@ -78,12 +79,19 @@ module.exports = class ChannelManager extends Emitter {
     util.log(`${ansiColor.blue('getTargets')} token: ${token || 'undefined'}, targets count: ${Object.keys(this._targets).length}`);
     util.log(`${ansiColor.blue('getTargets')} targets: ${JSON.stringify(this._targets, (key, value) => {
       // 避免循环引用导致的 JSON 序列化错误
+      if (key === 'ws') {
+        return {
+          token: value.token,
+        }
+      }
       if (key === 'channel' || key === 'ws') return '[Object]';
       return value;
     }, 2)}`);
     
-    // 不再过滤，直接返回所有 targets
-    return this._targets;
+    return Object.fromEntries(Object.entries(this._targets).filter(([, target]) => {
+      if (token) return target.token === token;
+      return !target.token
+    }));
   }
   getClients() {
     return this._clients;
