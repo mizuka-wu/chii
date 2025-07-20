@@ -68,11 +68,37 @@
     <div class="targets"></div>
   </div>
   <div class="description hidden">
-    You can use this script to inject the chii target code into your web page.<br/>
-    <a target="_blank" href="//{{domain}}{{basePath}}target.js">{{domain}}{{basePath}}target.js</a> <br/>
-    Or just open the demo page <a target="_blank" href="//{{domain}}{{basePath}}test/demo.html">{{domain}}{{basePath}}test/demo.html</a> to play around with.<br/>
-    <a target="_blank" href="https://chii.liriliri.io/">Chii v{{version}}</a>
+    <div class="description-en">
+      You can use this script to inject the chii target code into your web page.<br/>
+      <a target="_blank" href="//{{domain}}{{basePath}}target.js">{{domain}}{{basePath}}target.js</a> <br/>
+      Or just open the demo page <a target="_blank" href="//{{domain}}{{basePath}}test/demo.html">{{domain}}{{basePath}}test/demo.html</a> to play around with.<br/>
+      You can also find a session by token: <code>{{domain}}{{basePath}}?token=YOUR_TOKEN</code><br/>
+      <a target="_blank" href="https://chii.liriliri.io/">Chii v{{version}}</a>
+    </div>
+    <div class="description-zh" style="display:none;">
+      您可以使用此脚本将 chii 目标代码注入到您的网页中。<br/>
+      <a target="_blank" href="//{{domain}}{{basePath}}target.js">{{domain}}{{basePath}}target.js</a> <br/>
+      或者打开演示页面 <a target="_blank" href="//{{domain}}{{basePath}}test/demo.html">{{domain}}{{basePath}}test/demo.html</a> 进行体验。<br/>
+      您还可以通过 token 查找会话：<code>{{domain}}{{basePath}}?token=YOUR_TOKEN</code><br/>
+      <a target="_blank" href="https://chii.liriliri.io/">Chii v{{version}}</a>
+    </div>
   </div>
+  <script>
+    // 检测浏览器语言并显示相应的语言内容
+    (function() {
+      var userLang = navigator.language || navigator.userLanguage;
+      var descEn = document.querySelector('.description-en');
+      var descZh = document.querySelector('.description-zh');
+      
+      if (userLang.indexOf('zh') !== -1) {
+        descEn.style.display = 'none';
+        descZh.style.display = 'block';
+      } else {
+        descEn.style.display = 'block';
+        descZh.style.display = 'none';
+      }
+    })();
+  </script>
   <div class="help"></div>
   <script>
     window.domain = '{{domain}}';
