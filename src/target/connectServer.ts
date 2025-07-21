@@ -68,7 +68,7 @@ function createWebSocket(): Socket {
       title: (window as any).ChiiTitle || document.title,
       favicon: getFavicon(),
       '__chobitsu-hide__': true,
-      token: currentToken || undefined,
+      token: currentToken || '',
     })}`
   );
 }
