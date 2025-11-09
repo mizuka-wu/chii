@@ -171,6 +171,64 @@ if (window.VConsole) {
 
 使用上述代码，您可以在VConsole中添加一个名为"Chii"的tab，通过输入服务器地址和可选的token来连接Chii服务器进行调试。
 
+## 框架集成
+
+### Egg
+
+项目提供了一个 Egg 中间件入口 `@mizuka-wu/chii/egg`，用于将 Chii 挂载到现有 Egg 应用中：
+
+```js
+// app.js
+const registerChii = require('@mizuka-wu/chii/egg');
+
+module.exports = app => {
+  registerChii(app, {
+    basePath: '/playground/',
+    cdn: 'https://cdn.example.com/chii',
+  });
+};
+```
+
+参数说明：
+
+- `basePath`：挂载的访问前缀（默认 `/`，会自动补齐前后的 `/`）；
+- `domain`：用于模板渲染的域名，默认读取 Egg 集群配置；
+- `cdn`：可选，指定前端资源 CDN；
+- `compress`：是否启用 Chii 自带压缩中间件，默认为 `true`；
+- `logger`：输出日志对象，默认使用 `app.logger`。
+
+挂载后访问 `http://host:port/playground/`（取决于 `basePath`）即可打开调试界面，页面注入脚本只需 `<script src="//host:port/playground/target.js"></script>`。
+
+示例应用位于 [`examples/egg`](examples/egg)，包含完整的 Egg 项目结构，可通过以下命令启动：
+
+```bash
+npm install --prefix examples/egg
+npm run dev:egg
+```
+
+`dev:egg` 脚本会在仓库根目录执行 `npm run dev --prefix examples/egg`，因此需要先在示例目录安装自身依赖。启动后访问 `http://127.0.0.1:7001/` 查看示例首页，调试面板位于 `http://127.0.0.1:7001/chii/`。
+
+### Express / Nest 代理
+
+对于 Express、Nest 等基于 Node.js 的框架，可以将 Chii 作为独立服务启动，再通过代理转发指定前缀：
+
+```js
+const { createChiiProxy } = require('@mizuka-wu/chii/proxy');
+
+const chiiProxy = createChiiProxy({
+  target: 'http://127.0.0.1:9229',
+  basePath: '/devtools/chii',
+});
+
+app.use(chiiProxy);
+server.on('upgrade', chiiProxy.upgrade);
+```
+
+Windows 或容器环境中可将 `target` 指向真实的 Chii 服务地址。完整示例参见：
+
+- Express 版本：[`examples/express-proxy.js`](examples/express-proxy.js)
+- Nest 版本：[`examples/nest-proxy.ts`](examples/nest-proxy.ts)
+
 ## 相关项目
 
 * [whistle.chii](https://github.com/liriliri/whistle.chii)：Whistle Chii 插件。

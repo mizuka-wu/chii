@@ -171,6 +171,64 @@ if (window.VConsole) {
 
 With the code above, you can add a tab named "Chii" in VConsole, allowing you to connect to a Chii server for debugging by entering the server address and an optional token.
 
+## Framework Integration
+
+### Egg
+
+We expose an Egg middleware entry `@mizuka-wu/chii/egg` to mount Chii onto an existing Egg application:
+
+```js
+// app.js
+const registerChii = require('@mizuka-wu/chii/egg');
+
+module.exports = app => {
+  registerChii(app, {
+    basePath: '/playground/',
+    cdn: 'https://cdn.example.com/chii',
+  });
+};
+```
+
+Key options:
+
+- `basePath`: mounting prefix (defaults to `/`, automatically padded with leading/trailing `/`).
+- `domain`: domain used when rendering templates, defaults to Egg cluster configuration.
+- `cdn`: optional CDN host for frontend assets.
+- `compress`: whether to enable Chii's internal compression middleware (default `true`).
+- `logger`: logger instance for initialization logs (defaults to `app.logger`).
+
+After mounting, visit `http://host:port/playground/` (depending on `basePath`) to open the DevTools UI, and inject `<script src="//host:port/playground/target.js"></script>` into target pages.
+
+A full sample project lives in [`examples/egg`](examples/egg). Run it via:
+
+```bash
+npm install --prefix examples/egg
+npm run dev:egg
+```
+
+The `dev:egg` script runs `npm run dev --prefix examples/egg` from the repository root, so make sure to install dependencies inside the example folder first. Then open `http://127.0.0.1:7001/` for the sample homepage and `http://127.0.0.1:7001/chii/` for the DevTools panel.
+
+### Express / Nest proxy
+
+For frameworks such as Express or Nest, start Chii as a standalone service and forward requests through the provided proxy helper:
+
+```js
+const { createChiiProxy } = require('@mizuka-wu/chii/proxy');
+
+const chiiProxy = createChiiProxy({
+  target: 'http://127.0.0.1:9229',
+  basePath: '/devtools/chii',
+});
+
+app.use(chiiProxy);
+server.on('upgrade', chiiProxy.upgrade);
+```
+
+See the complete examples for more context:
+
+- Express: [`examples/express-proxy.js`](examples/express-proxy.js)
+- Nest: [`examples/nest-proxy.ts`](examples/nest-proxy.ts)
+
 ## Related Projects
 
 * [whistle.chii](https://github.com/liriliri/whistle.chii): Whistle Chii plugin.
