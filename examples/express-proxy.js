@@ -1,7 +1,8 @@
+// Install dependencies: npm install express @mizuka-wu/chii
 const express = require('express');
 const http = require('http');
-const { createChiiProxy } = require('../server/proxy');
-const chii = require('../server');
+const chii = require('@mizuka-wu/chii');
+const { createChiiProxy } = require('@mizuka-wu/chii/proxy');
 
 async function main() {
   const app = express();

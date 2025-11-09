@@ -3,8 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { createServer } from 'http';
 
 // @ts-nocheck
-const chii = require('../server');
-const { createChiiProxy } = require('../server/proxy');
+const chii = require('@mizuka-wu/chii');
+const { createChiiProxy } = require('@mizuka-wu/chii/proxy');
 
 @Controller()
 class AppController {

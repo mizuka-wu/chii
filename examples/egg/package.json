@@ -9,7 +9,7 @@
     "stop": "egg-scripts stop"
   },
   "dependencies": {
-    "@mizuka-wu/chii": "^0.1.1",
+    "@mizuka-wu/chii": "^0.1.2",
     "egg": "^3.0.0"
   },
   "devDependencies": {
