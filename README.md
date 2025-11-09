@@ -226,8 +226,20 @@ server.on('upgrade', chiiProxy.upgrade);
 
 See the complete examples for more context:
 
-- Express: [`examples/express-proxy.js`](examples/express-proxy.js)
-- Nest: [`examples/nest-proxy.ts`](examples/nest-proxy.ts)
+- Express: [`examples/express`](examples/express)
+- Nest: [`examples/nest`](examples/nest)
+
+Run them with:
+
+```bash
+npm install --prefix examples/express
+npm run dev:express
+
+npm install --prefix examples/nest
+npm run dev:nest
+```
+
+Both examples expose the debug UI at `/devtools/chii` on `http://127.0.0.1:3000/`.
 
 ## Related Projects
 

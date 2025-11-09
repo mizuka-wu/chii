@@ -34,6 +34,8 @@
     "build:front_end": "cd devtools/devtools-frontend && gn gen out/Default --args=\"is_debug=false\" && autoninja -C out/Default && gulp copy:release",
     "dev": "webpack --mode=development -w",
     "dev:egg": "npm run dev --prefix examples/egg",
+    "dev:express": "npm run dev --prefix examples/express",
+    "dev:nest": "npm run dev --prefix examples/nest",
     "dev:front_end": "cd devtools/devtools-frontend && gn gen out/Default --args=\"is_debug=true\" && autoninja -C out/Default && gulp copy:dev",
     "lint": "npm run lint:server && npm run lint:target",
     "lint:server": "eslint \"server/**/*.js\" \"bin/*.js\"",

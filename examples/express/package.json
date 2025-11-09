@@ -1,0 +1,13 @@
+{
+  "name": "chii-express-example",
+  "version": "0.0.1",
+  "description": "Express proxy example for @mizuka-wu/chii",
+  "private": true,
+  "scripts": {
+    "dev": "node src/main.js"
+  },
+  "dependencies": {
+    "@mizuka-wu/chii": "^0.1.2",
+    "express": "^4.19.2"
+  }
+}

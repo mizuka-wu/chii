@@ -224,10 +224,22 @@ app.use(chiiProxy);
 server.on('upgrade', chiiProxy.upgrade);
 ```
 
-Windows 或容器环境中可将 `target` 指向真实的 Chii 服务地址。完整示例参见：
+Windows 或容器环境中可将 `target` 指向真实的 Chii 服务地址。完整示例位于：
 
-- Express 版本：[`examples/express-proxy.js`](examples/express-proxy.js)
-- Nest 版本：[`examples/nest-proxy.ts`](examples/nest-proxy.ts)
+- Express 项目：[`examples/express`](examples/express)
+- Nest 项目：[`examples/nest`](examples/nest)
+
+运行前请分别安装依赖：
+
+```bash
+npm install --prefix examples/express
+npm run dev:express
+
+npm install --prefix examples/nest
+npm run dev:nest
+```
+
+Express 示例默认监听 `http://127.0.0.1:3000/`，调试面板路径为 `/devtools/chii`；Nest 示例同样使用该路径。
 
 ## 相关项目
 
