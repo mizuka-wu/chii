@@ -23,6 +23,77 @@ declare const window: any;
 
 const os = detectOs();
 
+function normalizePathSegment(segment?: string) {
+  if (!segment) {
+    return '';
+  }
+  const trimmed = segment.trim();
+  if (!trimmed || trimmed === '/') {
+    return '';
+  }
+  return trimmed.replace(/^\/+/g, '').replace(/\/+$/g, '');
+}
+
+function joinBasePath(...segments: Array<string | undefined>) {
+  const normalized = segments
+    .map(normalizePathSegment)
+    .filter(Boolean);
+  if (!normalized.length) {
+    return '/';
+  }
+  return `/${normalized.join('/')}/`;
+}
+
+function resolveDomainConfig(domain?: string, basePath?: string) {
+  let host = location.host;
+  let domainPath = '';
+  let protocol: string | undefined;
+
+  const applyHostAndPath = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+      return;
+    }
+    const slashIndex = trimmedValue.indexOf('/');
+    if (slashIndex !== -1) {
+      host = trimmedValue.slice(0, slashIndex);
+      domainPath = trimmedValue.slice(slashIndex);
+    } else {
+      host = trimmedValue;
+    }
+  };
+
+  if (domain) {
+    const trimmedDomain = domain.trim();
+    if (trimmedDomain) {
+      if (/^[a-z]+:\/\//i.test(trimmedDomain)) {
+        try {
+          const url = new URL(trimmedDomain);
+          host = url.host;
+          domainPath = url.pathname;
+          protocol = url.protocol;
+        } catch (e) {
+          const withoutProtocol = trimmedDomain.replace(/^[a-z]+:\/\//i, '');
+          applyHostAndPath(withoutProtocol);
+        }
+      } else {
+        applyHostAndPath(trimmedDomain);
+      }
+    }
+  }
+
+  return {
+    host,
+    basePath: joinBasePath(domainPath, basePath),
+    protocol: protocol && protocol.endsWith(':') ? protocol : protocol ? `${protocol}:` : undefined,
+  };
+}
+
+const domainConfig = resolveDomainConfig(window.domain, window.basePath);
+const httpProtocol = domainConfig.protocol || location.protocol;
+const baseHttpUrl = `${httpProtocol}//${domainConfig.host}${domainConfig.basePath}`;
+const baseWsAddress = `${domainConfig.host}${domainConfig.basePath}`;
+
 switch (os) {
   case 'linux':
     $('body').addClass('platform-linux');
@@ -33,12 +104,10 @@ switch (os) {
 }
 
 function inspect(id: string, rtc: boolean) {
-  const { domain, basePath } = window;
   const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
   const url =
-    location.protocol +
-    `//${domain}${basePath}front_end/chii_app.html?${protocol}=${encodeURIComponent(
-      `${domain}${basePath}client/${randomId(6)}?target=${id}`
+    `${baseHttpUrl}front_end/chii_app.html?${protocol}=${encodeURIComponent(
+      `${baseWsAddress}client/${randomId(6)}?target=${id}`
     )}&rtc=${rtc}`;
   window.open(url, '_blank');
 }
@@ -48,7 +117,7 @@ setInterval(() => {
   if (document.hidden) {
     return;
   }
-  fetch(`${window.basePath}timestamp`)
+  fetch(`${baseHttpUrl}timestamp`)
     .then(res => res.text())
     .then(timestamp => {
       if (toInt(timestamp) > start) {
@@ -122,7 +191,7 @@ const dataGrid = new LunaDataGrid($targets.get(0) as HTMLElement, {
 });
 
 function update() {
-  fetch(`${window.basePath}targets${location.search}`)
+  fetch(`${baseHttpUrl}targets${location.search}`)
     .then(res => res.json())
     .then(data => {
       const count = data.targets.length;
