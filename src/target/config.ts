@@ -3,44 +3,106 @@ import endWith from 'licia/endWith';
 import safeStorage from 'licia/safeStorage';
 import randomId from 'licia/randomId';
 import rtrim from 'licia/rtrim';
-import startWith from 'licia/startWith';
 
-let serverUrl = location.origin;
+const linkParser = document.createElement('a');
 
-if ((window as any).ChiiServerUrl) {
-  serverUrl = (window as any).ChiiServerUrl;
-} else {
-  const element = getTargetScriptEl();
-  if (element) {
-    serverUrl = element.src.replace('target.js', '');
+function normalizePathSegment(segment?: string) {
+  if (!segment) {
+    return '';
   }
-}
-
-if (!endWith(serverUrl, '/')) {
-  serverUrl += '/';
-}
-
-if (!startWith(serverUrl, 'http')) {
-  const protocol = location.protocol === 'https:' ? 'https:' : 'http:';
-  if (!startWith(serverUrl, '//')) {
-    serverUrl = `//${serverUrl}`;
+  const trimmed = segment.trim();
+  if (!trimmed || trimmed === '/') {
+    return '';
   }
-  serverUrl = `${protocol}${serverUrl}`;
+  return trimmed.replace(/^\/+/g, '').replace(/\/+$/g, '');
 }
+
+function joinBasePath(...segments: Array<string | undefined>) {
+  const normalized = segments
+    .map(normalizePathSegment)
+    .filter(Boolean);
+  if (!normalized.length) {
+    return '/';
+  }
+  return `/${normalized.join('/')}/`;
+}
+
+function parseServerInput(value: string, fallbackProtocol: string) {
+  const normalizedValue = value.trim();
+  if (/^[a-z]+:\/\//i.test(normalizedValue)) {
+    linkParser.href = normalizedValue;
+  } else if (normalizedValue.startsWith('//')) {
+    linkParser.href = `${fallbackProtocol}${normalizedValue}`;
+  } else if (normalizedValue.startsWith('/')) {
+    linkParser.href = `${fallbackProtocol}//${location.host}${normalizedValue}`;
+  } else {
+    linkParser.href = `${fallbackProtocol}//${normalizedValue}`;
+  }
+
+  return {
+    protocol: linkParser.protocol,
+    host: linkParser.host,
+    pathname: linkParser.pathname,
+  };
+}
+
+function resolveServerBase(raw?: string) {
+  const fallbackProtocol = location.protocol === 'https:' ? 'https:' : 'http:';
+  let host = location.host;
+  let pathname = '/';
+  let protocol: string | undefined;
+
+  if (raw) {
+    const trimmedRaw = raw.trim();
+    if (trimmedRaw) {
+      const parsed = parseServerInput(trimmedRaw, fallbackProtocol);
+      if (parsed.host) {
+        host = parsed.host;
+      }
+      if (parsed.pathname) {
+        pathname = parsed.pathname;
+      }
+      if (parsed.protocol) {
+        protocol = parsed.protocol;
+      }
+    }
+  }
+
+  const basePath = joinBasePath(pathname);
+  const httpProtocol = protocol || fallbackProtocol;
+  const httpUrl = `${httpProtocol}//${host}${basePath}`;
+  const wsProtocol = httpProtocol === 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `${wsProtocol}//${host}${basePath}`;
+
+  return {
+    httpUrl,
+    wsUrl,
+  };
+}
+
+const targetScript = getTargetScriptEl();
+const rawServerUrl = (window as any).ChiiServerUrl
+  ? (window as any).ChiiServerUrl
+  : targetScript
+  ? targetScript.src.replace(/target\.js(?:[?#].*)?$/, '')
+  : undefined;
+
+const resolvedServer = resolveServerBase(rawServerUrl);
+const serverUrl = resolvedServer.httpUrl;
+const serverWsUrl = resolvedServer.wsUrl;
 
 let embedded = false;
 let rtc = false;
 let cdn = '';
 
-const element = getTargetScriptEl();
-if (element) {
-  if (element.getAttribute('embedded') === 'true') {
+if (targetScript) {
+  if (targetScript.getAttribute('embedded') === 'true') {
     embedded = true;
   }
-  if (element.getAttribute('rtc') === 'true') {
+  if (targetScript.getAttribute('rtc') === 'true') {
     rtc = true;
   }
-  cdn = element.getAttribute('cdn') || '';
+  cdn = targetScript.getAttribute('cdn') || '';
 }
 
 if (cdn && endWith(cdn, '/')) {
@@ -58,6 +120,7 @@ if (!id) {
 export {
   // https://chii.liriliri.io/base/
   serverUrl,
+  serverWsUrl,
   embedded,
   rtc,
   cdn,

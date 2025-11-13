@@ -1,7 +1,7 @@
 import Socket from 'licia/Socket';
 import query from 'licia/query';
 import chobitsu from 'chobitsu';
-import { serverUrl, id } from './config';
+import { serverUrl, serverWsUrl, id } from './config';
 import { getFavicon } from './util';
 
 export default async function () {
@@ -37,7 +37,7 @@ export default async function () {
   });
 
   const ws = new Socket(
-    `${serverUrl.replace(/^http/, 'ws')}target/${id}?${query.stringify({
+    `${serverWsUrl}target/${id}?${query.stringify({
       url: location.href,
       title: (window as any).ChiiTitle || document.title || 'Unknown',
       favicon: getFavicon(),

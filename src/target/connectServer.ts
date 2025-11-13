@@ -1,7 +1,7 @@
 import Socket from 'licia/Socket';
 import query from 'licia/query';
 import chobitsu from 'chobitsu';
-import { serverUrl, id } from './config';
+import { serverUrl, serverWsUrl, id } from './config';
 import { getFavicon } from './util';
 
 let isInit = false;
@@ -63,7 +63,7 @@ export default function () {
 // 创建WebSocket连接的函数
 function createWebSocket(): Socket {
   return new Socket(
-    `${serverUrl.replace(/^http/, 'ws')}target/${id}?${query.stringify({
+    `${serverWsUrl}target/${id}?${query.stringify({
       url: location.href,
       title: (window as any).ChiiTitle || document.title,
       favicon: getFavicon(),
