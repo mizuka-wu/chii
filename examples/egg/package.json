@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@mizuka-wu/chii": "^0.1.2",
-    "egg": "^3.0.0"
+    "egg": "^3.0.0",
+    "puppeteer": "^23.7.1"
   },
   "devDependencies": {
     "egg-bin": "^5.0.0",
