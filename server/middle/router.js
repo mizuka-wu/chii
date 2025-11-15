@@ -14,13 +14,20 @@ const proxy = require('../lib/proxy');
 
 const maxAge = ms('2h');
 
+function normalizeDomain(value) {
+  if (!value) {
+    return '';
+  }
+  return value.replace(/^https?:\/\//i, '').replace(/\/+$|\/$/g, '');
+}
+
 module.exports = function (channelManager, domain, cdn, basePath) {
   const router = new Router();
 
   router.get(basePath, async ctx => {
     const tpl = await readTpl('index');
     ctx.body = tpl({
-      domain,
+      domain: normalizeDomain(domain) || ctx.request.host,
       basePath,
       version: pkg.version,
     });

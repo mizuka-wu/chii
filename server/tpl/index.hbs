@@ -101,8 +101,17 @@
   </script>
   <div class="help"></div>
   <script>
-    window.domain = '{{domain}}';
-    window.basePath = '{{basePath}}';
+    (function() {
+      var rawDomain = '{{domain}}'.trim();
+      var normalizedDomain = rawDomain
+        .replace(/^https?:\/\//i, '')
+        .replace(/\/+$|\/$/g, '');
+      if (!normalizedDomain) {
+        normalizedDomain = window.location.host;
+      }
+      window.domain = normalizedDomain;
+      window.basePath = '{{basePath}}';
+    })();
   </script>
   <script src="//{{domain}}{{basePath}}index.js"></script>
 </body>
