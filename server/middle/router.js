@@ -54,9 +54,10 @@ module.exports = function (channelManager, domain, cdn, basePath) {
   channelManager.on('target_changed', () => (timestamp = now()));
 
   router.get(`${basePath}targets`, ctx => {
-    const { token } = ctx.query;
+    const rawToken = typeof ctx.query.token === 'string' ? ctx.query.token.trim() : '';
+    const normalizedToken = rawToken || null;
     const targets = reverse(
-      map(pairs(channelManager.getTargets(token)), item => {
+      map(pairs(channelManager.getTargets(normalizedToken)), item => {
         const ret = {
           id: item[0],
           ...item[1],
